@@ -15,20 +15,23 @@ def send_postcard(album):
 
     c = cards[0]
 
-    files = [c.image.file.name]
-    photo = album.upload_photos(files, caption=c.comment_text)[0]
+    # upload photo
+    if not c.photo:
+        files = [c.image.file.name]
+        c.photo = album.upload_photos(files)[0]
 
-    # senc comment
-    text = u'[id%(receiver_id)s|%(receiver_name)s], эту открытку тебе прислал [id%(sender_id)s|%(sender_name)s]' % {
-        'receiver_id': c.receiver_id,
-        'receiver_name': c.receiver_name,
-        'sender_id': c.sender_id,
-        'sender_name': c.sender_name}
-    comment = Comment(text=text, object=photo, owner=album.owner, date=timezone.now())
+    # create comment
+    receiver = u'[id%(receiver_id)s|%(receiver_name)s]' % {'receiver_id': c.receiver_id, 'receiver_name': c.receiver_name, }
+    sender = u'[id%(sender_id)s|%(sender_name)s]' % {'sender_id': c.sender_id, 'sender_name': c.sender_name}
+
+    text = c.comment_text
+    text = text.replace('user1', receiver)
+    text = text.replace('user2', sender)
+
+    comment = Comment(text=text, object=c.photo, owner=album.owner, date=timezone.now())
     comment.save(commit_remote=True)
 
     c.comment = comment
-    c.photo = photo
     c.save()
 
     return c
