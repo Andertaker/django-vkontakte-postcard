@@ -7,15 +7,17 @@ from vkontakte_photos.models import Photo
 
 class Postcard(models.Model):
 
-    image = models.ImageField("Изображение открытки", upload_to="postcards")
+    image = models.ImageField("Изображение открытки", upload_to=".")
     comment_text = models.TextField("Текст комментария")
     sender_id = models.BigIntegerField()
     sender_name = models.CharField("Имя отправителя", max_length=30)
     receiver_id = models.BigIntegerField()
     receiver_name = models.CharField("Имя получателя", max_length=30)
 
+    is_anonymous = models.NullBooleanField(null=True, blank=True, default=None)
+
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     photo = models.ForeignKey(Photo, null=True, blank=True)
     comment = models.ForeignKey(Comment, null=True, blank=True)
